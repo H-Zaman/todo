@@ -149,7 +149,11 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
                   if(!_key.currentState!.validate()) return ;
                   Get.back();
                   if(_isUpdate){
-                    controller.updateTodo(widget.todo!..todo = _textEditingController.text);
+                    controller.updateTodo(
+                      widget.todo!
+                        ..editHistory.add(widget.todo!.todo)
+                        ..todo = _textEditingController.text
+                    );
                   }else{
                     controller.addTodo(_textEditingController.text);
                   }
