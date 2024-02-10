@@ -15,14 +15,14 @@ class TodoController extends GetxController{
   @override
   void onInit() {
     super.onInit();
-    _repo.todosStream().then((steam) => steam.listen((event) {
+    _repo.todosStream().listen((event) {
       if(event.docs.isNotEmpty){
         final items = List<Todo>.from(event.docs.map((e) => Todo.fromJson(e.data() as Map<String, dynamic>)));
         items.sort((b,a) => a.createdAt.compareTo(b.createdAt));
         todos(items);
       }
       loading(false);
-    }));
+    });
   }
 
   Future<void> addTodo(String todo) async => await _repo.addTodo(todo);

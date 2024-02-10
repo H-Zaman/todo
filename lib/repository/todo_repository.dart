@@ -8,7 +8,7 @@ class TodoRepo{
   final CollectionReference _ref = FirebaseFirestore.instance.collection('todos');
 
   /// return all todos
-  Future<Stream<QuerySnapshot<Object?>>> todosStream() async{
+  Stream<QuerySnapshot<Object?>> todosStream() {
     return _ref.where(
       /// when we delete a document
       /// we do not actually delete it

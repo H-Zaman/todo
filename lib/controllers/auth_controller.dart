@@ -10,6 +10,11 @@ class AuthController extends GetxController{
   bool get isLoggedIn => _user.value != null;
 
   final _authInstance = FirebaseAuth.instance;
+  GoogleSignIn googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+    ],
+  );
 
   @override
   void onInit() async{
@@ -26,17 +31,7 @@ class AuthController extends GetxController{
   Future<void> googleAuth() async {
     loading(true);
     try {
-      const List<String> scopes = <String>[
-        'email',
-        'https://www.googleapis.com/auth/contacts.readonly',
-      ];
-
-      GoogleSignIn googleSignIn = GoogleSignIn(
-        scopes: scopes,
-      );
-
       GoogleSignInAccount? googleAcc = await googleSignIn.signIn();
-
 
       if (googleAcc == null) {
         Get.showSnackbar(GetSnackBar(
