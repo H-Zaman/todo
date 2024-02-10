@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:todo/views/pages/auth_page.dart';
+import 'package:todo/root_bindings.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:todo/wrapper.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -19,30 +26,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         textTheme: GoogleFonts.odorMeanCheyTextTheme()
       ),
-      home: const Test(),
-    );
-  }
-}
-
-class Test extends StatelessWidget {
-  const Test({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: (){
-              Get.to(()=>AuthPage());
-            },
-            child: Text(
-              'Login page'
-            )
-          ),
-        ],
-      ),
+      initialBinding: RootBindings(),
+      home: const Wrapper(),
     );
   }
 }
