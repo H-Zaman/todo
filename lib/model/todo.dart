@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:todo/controllers/auth_controller.dart';
 
 enum TodoState{
   created,
@@ -8,6 +10,7 @@ enum TodoState{
 
 class Todo{
   final String id;
+  final String uid;
   String todo;
   List<String> editHistory;
   TodoState state;
@@ -16,6 +19,7 @@ class Todo{
 
   Todo({
     required this.id,
+    required this.uid,
     required this.todo,
     required this.state,
     required this.editHistory,
@@ -25,6 +29,7 @@ class Todo{
 
   factory Todo.fromJson(Map<String, dynamic> json) => Todo(
     id: json['id'],
+    uid: json['user_id'],
     todo: json['todo'],
     editHistory: List<String>.from(json['edits'].map((item) => item)),
     state: TodoState.values.firstWhere((element) => element.name == json['state']),
@@ -34,6 +39,7 @@ class Todo{
 
   factory Todo.fresh(String todo) => Todo(
     id: '${Timestamp.now().millisecondsSinceEpoch}',
+    uid: Get.find<AuthController>().user.uid,
     todo: todo,
     editHistory: [],
     state: TodoState.created,
@@ -43,6 +49,7 @@ class Todo{
 
   Map<String, dynamic> toJson()=>{
     'id' : id,
+    'user_id' : uid,
     'todo' : todo,
     'edits' : editHistory,
     'state' : state.name,

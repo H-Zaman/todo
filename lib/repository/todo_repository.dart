@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+import 'package:todo/controllers/auth_controller.dart';
 import 'package:todo/model/todo.dart';
 
 class TodoRepo{
@@ -9,13 +11,18 @@ class TodoRepo{
 
   /// return all todos
   Stream<QuerySnapshot<Object?>> todosStream() {
-    return _ref.where(
-      /// when we delete a document
-      /// we do not actually delete it
-      /// we just change its state to deleted
-      /// so fetching all documents which are not delete
-      'state', isNotEqualTo: TodoState.deleted.name
-    ).snapshots();
+    return _ref
+      .where(
+        /// when we delete a document
+        /// we do not actually delete it
+        /// we just change its state to deleted
+        /// so fetching all documents which are not delete
+        'state', isNotEqualTo: TodoState.deleted.name,
+      )
+      .where(
+        /// fetch the todos where the notes belong to current user
+        'user_id', isEqualTo: Get.find<AuthController>().user.uid
+      ).snapshots();
   }
 
   /// add a document
