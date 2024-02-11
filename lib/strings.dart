@@ -8,5 +8,6 @@ abstract class Strings{
   static const String create = 'Create';
   static const String update = 'Update';
   static const String delete = 'Delete';
+  static const String welcome = 'Welcome';
   static const String todo_validation_msg = 'Field can not be empty';
 }

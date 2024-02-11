@@ -4,6 +4,7 @@ import 'package:todo/controllers/todo_controller.dart';
 import 'package:todo/model/todo.dart';
 import 'package:todo/utils/extension.dart';
 import 'package:todo/views/pages/widgets/add_edit_todo_bottomsheet.dart';
+import 'package:todo/views/theme/text_style.dart';
 
 class TodoListTile extends StatelessWidget {
   final Todo todo;
@@ -12,33 +13,27 @@ class TodoListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: (){
-        Get.find<TodoController>().updateTodo(
-          todo..state = todo.state == TodoState.created ? TodoState.completed : TodoState.created
-        );
-      },
-      contentPadding: EdgeInsets.zero,
-      leading: IgnorePointer(
-        ignoring: true,
-        child: Radio(
-          groupValue: TodoState.completed,
-          value: todo.state,
-          onChanged: (_){},
-        ),
+      onTap: () => AddEditTodoBottomSheet.open(todo),
+      contentPadding: EdgeInsets.only(
+        left: 14,
+        right: 4
       ),
       title: Text(
-        todo.todo
+        todo.todo,
+        style: AppTextStyle.normal16,
       ),
       subtitle: Text(
         todo.createdAt.time
       ),
-      trailing: IconButton(
-        constraints: BoxConstraints(),
-        onPressed: () => AddEditTodoBottomSheet.open(todo),
-        icon: Icon(
-          Icons.edit
-        )
-      )
+      trailing: Checkbox(
+        value: todo.state == TodoState.completed,
+        onChanged: (_){
+          Get.find<TodoController>().updateTodo(
+            todo..state = todo.state == TodoState.created ? TodoState.completed : TodoState.created
+          );
+        },
+        activeColor: Colors.green,
+      ),
     );
   }
 }

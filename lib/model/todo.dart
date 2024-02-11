@@ -57,3 +57,12 @@ class Todo{
     'updatedAt' : Timestamp.now(),
   };
 }
+
+class TodoGroup{
+  final String group;
+  final List<Todo> todos;
+  const TodoGroup({
+    required this.group,
+    this.todos = const []
+  });
+}

@@ -12,6 +12,11 @@ abstract class AppTextStyle{
     fontWeight: FontWeight.bold
   );
 
+  static TextStyle get bold32 => TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.bold
+  );
+
   static TextStyle get medium24 => TextStyle(
     fontSize: 18,
   );
@@ -23,6 +28,16 @@ abstract class AppTextStyle{
 
   static TextStyle get normal20 => TextStyle(
     fontSize: 20,
+    fontWeight: FontWeight.normal
+  );
+
+  static TextStyle get normal16 => TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.normal
+  );
+
+  static TextStyle get normal12 => TextStyle(
+    fontSize: 12,
     fontWeight: FontWeight.normal
   );
 }
