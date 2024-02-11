@@ -113,7 +113,7 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
                 onTap: () async{
                   final pickedDate = await showDatePicker(
                     context: context,
-                    initialDate: reminderTime,
+                    initialDate: reminderTime ?? DateTime.now(),
                     firstDate: DateTime.now(),
                     lastDate: DateTime.now().add(Duration(days: 365)),
                   );

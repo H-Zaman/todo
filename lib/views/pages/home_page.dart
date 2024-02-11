@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          ...[...todoController.groups,...todoController.groups,...todoController.groups].map((group) => SliverStickyHeader(
+          ...todoController.groups.map((group) => SliverStickyHeader(
             header: Container(
               color: Colors.white,
               width: double.infinity,

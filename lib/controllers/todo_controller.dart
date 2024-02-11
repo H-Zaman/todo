@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:todo/model/todo.dart';
 import 'package:todo/repository/todo_repository.dart';
 import 'package:todo/utils/extension.dart';
 import 'package:todo/views/theme/text_style.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class TodoController extends GetxController{
 
   final TodoRepo _repo = TodoRepo();
+  final _localNotification = FlutterLocalNotificationsPlugin();
 
   RxBool loading = RxBool(true);
   RxBool saveInLocalDb = RxBool(false);
@@ -37,6 +42,10 @@ class TodoController extends GetxController{
 
   @override
   void onInit() {
+    _localNotification.initialize(InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: DarwinInitializationSettings()
+    ));
     super.onInit();
     getTodos();
     _repo.todosStream().listen((event) {
@@ -56,6 +65,8 @@ class TodoController extends GetxController{
       ..reminderTime = reminderTime;
     final success = await _repo.addTodo(todo);
     if(success && todo.isLocal) await getTodos();
+
+    if(todo.reminderTime != null) await _setReminder(todo);
   }
 
   Future<List<Todo>> getTodos() async => _localTodos(await _repo.getLocalTodos());
@@ -63,6 +74,28 @@ class TodoController extends GetxController{
   Future<void> updateTodo(Todo todo) async {
     final success = await _repo.editTodo(todo);
     if(success && todo.isLocal) await getTodos();
+    if(todo.reminderTime != null) await _setReminder(todo);
+  }
+
+  Future<void> _setReminder(Todo todo) async{
+    tz.initializeTimeZones();
+    final location = tz.getLocation(await FlutterNativeTimezone.getLocalTimezone());
+    tz.setLocalLocation(location);
+    await _localNotification.zonedSchedule(
+      int.parse(todo.id.substring(4)),
+      'Notes-Alarm',
+      todo.todo,
+      tz.TZDateTime.from(todo.reminderTime!, location),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          '_notes_app_channel_id',
+          '_notes_app_channel_name',
+          channelDescription: '_notes_app_channel_description'
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
+    );
   }
 
   Future<void> deleteTodo(Todo todo) async {
