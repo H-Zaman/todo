@@ -13,10 +13,11 @@ class TodoController extends GetxController{
   RxBool saveInLocalDb = RxBool(false);
 
   final RxList<Todo> _todos = RxList();
+  final RxList<Todo> _localTodos = RxList();
 
   List<TodoGroup> get groups {
     List<TodoGroup> temp = [];
-    for (Todo todo in _todos) {
+    for (Todo todo in [..._todos, ..._localTodos]) {
       final groupName = todo.createdAt.notificationGroupString;
       TodoGroup? group = temp.firstWhereOrNull((element) => element.group == groupName);
       if(group == null){
@@ -25,7 +26,10 @@ class TodoController extends GetxController{
           todos: [todo]
         ));
       }else{
-        temp.firstWhere((element) => element.group == groupName).todos.add(todo);
+        final group = temp.firstWhere((element) => element.group == groupName);
+        group.todos
+          ..add(todo)
+          ..sort((b,a) => a.createdAt.compareTo(b.createdAt));
       }
     }
     return temp;
@@ -34,6 +38,7 @@ class TodoController extends GetxController{
   @override
   void onInit() {
     super.onInit();
+    getTodos();
     _repo.todosStream().listen((event) {
       if(event.docs.isNotEmpty){
         final items = List<Todo>.from(event.docs.map((e) => Todo.fromJson(e.data() as Map<String, dynamic>)));
@@ -49,10 +54,16 @@ class TodoController extends GetxController{
     todo
       ..isLocal = saveInLocalDb.value
       ..reminderTime = reminderTime;
-    await _repo.addTodo(todo);
+    final success = await _repo.addTodo(todo);
+    if(success && todo.isLocal) await getTodos();
   }
 
-  Future<void> updateTodo(Todo todo) async => await _repo.editTodo(todo);
+  Future<List<Todo>> getTodos() async => _localTodos(await _repo.getLocalTodos());
+
+  Future<void> updateTodo(Todo todo) async {
+    final success = await _repo.editTodo(todo);
+    if(success && todo.isLocal) await getTodos();
+  }
 
   Future<void> deleteTodo(Todo todo) async {
     await Get.dialog(AlertDialog(
@@ -73,10 +84,11 @@ class TodoController extends GetxController{
           )
         ),
         TextButton(
-          onPressed: (){
+          onPressed: () async{
             Get.back();
             Get.back();
-            _repo.deleteTodo(todo);
+            final success = await _repo.deleteTodo(todo);
+            if(success && todo.isLocal) await getTodos();
           },
           child: Text(
             'Yes',

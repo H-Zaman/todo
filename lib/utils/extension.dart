@@ -1,23 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-extension TimeStampExtension on Timestamp{
-  String get time => DateFormat('HH:mm · MMM dd').format(toDate());
+extension DateTimeExtension on DateTime{
+  String get timeFull => DateFormat('hh:mm aa · MMM dd').format(this);
+
+  String get time => DateFormat('HH:mm · MMM dd').format(this);
 
   /// today, this_week, this_month, [12 - month names]
   String get notificationGroupString {
-    if(DateTime.now().difference(toDate()).inDays < 1){
+    if(DateTime.now().difference(this).inDays < 1){
       return 'Today';
-    }else if(DateTime.now().difference(toDate()).inDays < 7){
+    }else if(DateTime.now().difference(this).inDays < 7){
       return 'This week';
-    }else if(DateTime.now().difference(toDate()).inDays < 31){
+    }else if(DateTime.now().difference(this).inDays < 31){
       return 'This Month';
     }else{
-      return DateFormat('MMMM').format(toDate());
+      return DateFormat('MMMM').format(this);
     }
   }
-}
-
-extension DateTimeExtension on DateTime{
-  String get time => DateFormat('hh:mm aa · MMM dd').format(this);
 }

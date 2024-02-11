@@ -30,8 +30,26 @@ class TodoListTile extends StatelessWidget {
           ),
         ],
       ),
-      subtitle: Text(
-        todo.createdAt.time
+      subtitle: RichText(
+        text: TextSpan(
+          text: todo.createdAt.time,
+          style: AppTextStyle.normal14.copyWith(
+            color: Colors.grey.shade600
+          ),
+          children: [
+            if(todo.isLocal) ...[
+              WidgetSpan(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Icon(
+                    Icons.storage_rounded,
+                    size: 16,
+                  ),
+                )
+              )
+            ]
+          ]
+        ),
       ),
       trailing: Checkbox(
         value: todo.state == TodoState.completed,

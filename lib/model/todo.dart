@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:todo/controllers/auth_controller.dart';
 
@@ -16,8 +15,8 @@ class Todo{
   TodoState state;
   DateTime? reminderTime;
   bool isLocal;
-  final Timestamp createdAt;
-  final Timestamp updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Todo({
     required this.id,
@@ -31,6 +30,9 @@ class Todo{
     this.isLocal = false
   });
 
+  @override
+  operator == (Object other) => other is Todo && other.id == id;
+
   factory Todo.fromJson(Map<String, dynamic> json) => Todo(
     id: json['id'],
     uid: json['user_id'],
@@ -38,19 +40,19 @@ class Todo{
     isLocal: json['isLocal'] ?? false,
     editHistory: List<String>.from(json['edits'].map((item) => item)),
     state: TodoState.values.firstWhere((element) => element.name == json['state']),
-    createdAt: json['createdAt'],
-    updatedAt: json['updatedAt'],
+    createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: DateTime.parse(json['updatedAt']),
     reminderTime: json['reminderTime'] == null ? null : DateTime.parse(json['reminderTime'])
   );
 
   factory Todo.fresh(String todo) => Todo(
-    id: '${Timestamp.now().millisecondsSinceEpoch}',
+    id: '${DateTime.now().millisecondsSinceEpoch}',
     uid: Get.find<AuthController>().user.uid,
     todo: todo,
     editHistory: [],
     state: TodoState.created,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
   );
 
   Map<String, dynamic> toJson()=>{
@@ -60,10 +62,13 @@ class Todo{
     'isLocal' : isLocal,
     'edits' : editHistory,
     'state' : state.name,
-    'createdAt' : createdAt,
-    'updatedAt' : Timestamp.now(),
+    'createdAt' : createdAt.toIso8601String(),
+    'updatedAt' : DateTime.now().toIso8601String(),
     if(reminderTime != null) 'reminderTime' : reminderTime!.toIso8601String()
   };
+
+  @override
+  int get hashCode => super.hashCode;
 }
 
 class TodoGroup{

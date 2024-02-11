@@ -40,4 +40,9 @@ abstract class AppTextStyle{
     fontSize: 12,
     fontWeight: FontWeight.normal
   );
+
+  static TextStyle get normal14 => TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.normal
+  );
 }
