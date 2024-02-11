@@ -10,6 +10,7 @@ class TodoController extends GetxController{
   final TodoRepo _repo = TodoRepo();
 
   RxBool loading = RxBool(true);
+  RxBool saveInLocalDb = RxBool(false);
 
   final RxList<Todo> _todos = RxList();
 

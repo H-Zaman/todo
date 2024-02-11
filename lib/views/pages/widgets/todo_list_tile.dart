@@ -18,9 +18,17 @@ class TodoListTile extends StatelessWidget {
         left: 14,
         right: 4
       ),
-      title: Text(
-        todo.todo,
-        style: AppTextStyle.normal16,
+      title: Stack(
+        children: [
+          Text(
+            todo.todo,
+            style: AppTextStyle.normal16.copyWith(
+              color: todo.state == TodoState.completed ? Colors.green : Colors.black,
+              decoration: todo.state == TodoState.completed ? TextDecoration.lineThrough : null,
+              decorationColor: todo.state == TodoState.completed ? Colors.green : Colors.black,
+            ),
+          ),
+        ],
       ),
       subtitle: Text(
         todo.createdAt.time

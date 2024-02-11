@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
           if(todoController.groups.isEmpty) SliverFillRemaining(
             child: Center(
               child: Text(
-                Strings.no_todo_found,
+                Strings.no_notes_found,
                 style: AppTextStyle.bold24
               ),
             ),

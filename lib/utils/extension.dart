@@ -17,3 +17,7 @@ extension TimeStampExtension on Timestamp{
     }
   }
 }
+
+extension DateTimeExtension on DateTime{
+  String get time => DateFormat('hh:mm aa · MMM dd').format(this);
+}

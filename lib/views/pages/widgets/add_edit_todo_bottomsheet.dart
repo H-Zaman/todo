@@ -1,9 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo/controllers/todo_controller.dart';
 import 'package:todo/model/todo.dart';
 import 'package:todo/strings.dart';
-import 'package:todo/views/theme/images.dart';
+import 'package:todo/utils/extension.dart';
 import 'package:todo/views/theme/text_style.dart';
 
 class AddEditTodoBottomSheet extends StatefulWidget {
@@ -39,23 +40,17 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
     if(widget.todo != null) _textEditingController.text = widget.todo!.todo;
   }
 
+  DateTime? reminderTime;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       /// closing keyboard when somewhere is pressed on the bottom sheet
       onTap: FocusScope.of(context).unfocus,
       child: Container(
-        /// when the keyboard is open bottom sheet will scroll to
-        /// the maximum height which does not look very good
-        /// for small devices
-        /// so when keyboard is open adding a manual space at top to
-        /// make it look nicer
-        margin: EdgeInsets.only(top: MediaQuery.of(context).viewInsets.bottom > 0 ? 80 : 0),
+        margin: EdgeInsets.only(top: 36),
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(AppImages.bg4),
-            fit: BoxFit.cover
-          ),
+          color: Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -65,7 +60,7 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
           key: _key,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
@@ -76,13 +71,13 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
                   top: 14
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
+                    SizedBox(width: 32),
+                    Center(
                       child: Text(
-                        _isUpdate ? Strings.edit_todo : Strings.add_todo,
-                        style: AppTextStyle.medium24.copyWith(
-                          color: Colors.white
-                        ),
+                        _isUpdate ? Strings.edit_note : Strings.add_note,
+                        style: AppTextStyle.medium24
                       ),
                     ),
                     CloseButton()
@@ -93,12 +88,10 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: TextFormField(
-                  style: AppTextStyle.normal20.copyWith(
-                    color: Colors.white
-                  ),
+                  style: AppTextStyle.normal16,
                   controller: _textEditingController,
-                  maxLines: 5,
-                  minLines: 2,
+                  maxLines: 10,
+                  minLines: 5,
                   textInputAction: TextInputAction.done,
                   validator: (string){
                     if(string == null || string.isEmpty) return Strings.todo_validation_msg;
@@ -109,41 +102,81 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
                     hintStyle: AppTextStyle.medium12.copyWith(
                       color: Colors.grey.shade400
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.grey,
-                        width: 4
-                      )
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.purple,
-                        width: 2.2
-                      )
-                    ),
                   ),
                 ),
               ),
 
+              ListTile(
+                onTap: () async{
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(Duration(days: 365))
+                  );
+
+                  if(pickedDate == null) return ;
+
+                  final pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+
+                  if(pickedTime == null) return ;
+
+                  setState(() {
+                    reminderTime = DateTime(
+                      pickedDate.year,
+                      pickedDate.month,
+                      pickedDate.day,
+                      pickedTime.hour,
+                      pickedTime.minute,
+                    );
+                  });
+                },
+                leading: Icon(
+                  CupertinoIcons.bell,
+                  color: reminderTime == null ? Colors.grey : Colors.blue,
+                ),
+                title: Text(
+                  reminderTime == null ? 'Set reminder' : reminderTime!.time,
+                ),
+              ),
+
+              Obx(()=>SwitchListTile(
+                value: controller.saveInLocalDb.value,
+                onChanged: controller.saveInLocalDb,
+                title: Text(
+                  Strings.save_note_in_local
+                ),
+                secondary: Icon(
+                  Icons.storage_rounded,
+                  color: controller.saveInLocalDb.value ? Colors.blue : Colors.grey,
+                ),
+              )),
+
+              Spacer(),
               if(_isUpdate) ...[
-                Center(
-                  child: TextButton(
-                    onPressed: (){
-                      controller.deleteTodo(widget.todo!);
-                    },
-                    child: Text(
-                      Strings.delete,
-                      style: AppTextStyle.medium12.copyWith(
-                        color: Colors.red
-                      ),
-                    )
+                ElevatedButton(
+                  onPressed: (){
+                    controller.deleteTodo(widget.todo!);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero
+                    ),
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.red
                   ),
+                  child: Text(
+                    Strings.delete,
+                    style: AppTextStyle.normal20.copyWith(
+                      color: Colors.white,
+                      letterSpacing: 1.2
+                    ),
+                  )
                 ),
                 SizedBox(height: 14),
               ],
-
               ElevatedButton(
                 onPressed: (){
                   if(!_key.currentState!.validate()) return ;
@@ -163,7 +196,7 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
                     borderRadius: BorderRadius.zero
                   ),
                   minimumSize: Size(double.infinity, 50),
-                  backgroundColor: Colors.purple
+                  backgroundColor: Colors.blue
                 ),
                 child: Text(
                   _isUpdate ? Strings.update : Strings.create,
@@ -172,7 +205,7 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
                     letterSpacing: 1.2
                   ),
                 )
-              )
+              ),
             ],
           ),
         ),
