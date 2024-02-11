@@ -37,7 +37,10 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
   @override
   void initState() {
     super.initState();
-    if(widget.todo != null) _textEditingController.text = widget.todo!.todo;
+    if(widget.todo != null) {
+      _textEditingController.text = widget.todo!.todo;
+      reminderTime = widget.todo!.reminderTime;
+    }
   }
 
   DateTime? reminderTime;
@@ -110,15 +113,16 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
                 onTap: () async{
                   final pickedDate = await showDatePicker(
                     context: context,
+                    initialDate: reminderTime,
                     firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(Duration(days: 365))
+                    lastDate: DateTime.now().add(Duration(days: 365)),
                   );
 
                   if(pickedDate == null) return ;
 
                   final pickedTime = await showTimePicker(
                     context: context,
-                    initialTime: TimeOfDay.now(),
+                    initialTime: reminderTime == null ? TimeOfDay.now() : TimeOfDay(hour: reminderTime!.hour, minute: reminderTime!.minute),
                   );
 
                   if(pickedTime == null) return ;
@@ -139,14 +143,23 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
                 ),
                 title: Text(
                   reminderTime == null ? 'Set reminder' : reminderTime!.time,
+                  style: TextStyle(
+                    color: reminderTime == null ? Colors.grey : Colors.black,
+                  ),
                 ),
               ),
 
-              Obx(()=>SwitchListTile(
+              /// making sure no duplicates are created
+              /// by changing from local/firebase
+              /// maybe allow sync in a later version
+              if(!_isUpdate) Obx(()=>SwitchListTile(
                 value: controller.saveInLocalDb.value,
                 onChanged: controller.saveInLocalDb,
                 title: Text(
-                  Strings.save_note_in_local
+                  Strings.save_note_in_local,
+                  style: TextStyle(
+                    color: controller.saveInLocalDb.value ? Colors.black : Colors.grey
+                  ),
                 ),
                 secondary: Icon(
                   Icons.storage_rounded,
@@ -185,10 +198,11 @@ class _AddEditTodoBottomSheetState extends State<AddEditTodoBottomSheet> {
                     controller.updateTodo(
                       widget.todo!
                         ..editHistory.add(widget.todo!.todo)
+                        ..reminderTime = reminderTime
                         ..todo = _textEditingController.text
                     );
                   }else{
-                    controller.addTodo(_textEditingController.text);
+                    controller.addTodo(_textEditingController.text, reminderTime);
                   }
                 },
                 style: ElevatedButton.styleFrom(

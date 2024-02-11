@@ -27,9 +27,8 @@ class TodoRepo{
 
   /// add a document
   /// returns success
-  Future<bool> addTodo(String string) async{
+  Future<bool> addTodo(Todo todo) async{
     try{
-      final todo = Todo.fresh(string);
       await _ref.doc(todo.id).set(todo.toJson());
       return true;
     }catch(err){

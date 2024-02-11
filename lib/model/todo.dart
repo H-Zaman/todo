@@ -14,6 +14,8 @@ class Todo{
   String todo;
   List<String> editHistory;
   TodoState state;
+  DateTime? reminderTime;
+  bool isLocal;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
@@ -25,16 +27,20 @@ class Todo{
     required this.editHistory,
     required this.createdAt,
     required this.updatedAt,
+    this.reminderTime,
+    this.isLocal = false
   });
 
   factory Todo.fromJson(Map<String, dynamic> json) => Todo(
     id: json['id'],
     uid: json['user_id'],
     todo: json['todo'],
+    isLocal: json['isLocal'] ?? false,
     editHistory: List<String>.from(json['edits'].map((item) => item)),
     state: TodoState.values.firstWhere((element) => element.name == json['state']),
     createdAt: json['createdAt'],
     updatedAt: json['updatedAt'],
+    reminderTime: json['reminderTime'] == null ? null : DateTime.parse(json['reminderTime'])
   );
 
   factory Todo.fresh(String todo) => Todo(
@@ -51,10 +57,12 @@ class Todo{
     'id' : id,
     'user_id' : uid,
     'todo' : todo,
+    'isLocal' : isLocal,
     'edits' : editHistory,
     'state' : state.name,
     'createdAt' : createdAt,
     'updatedAt' : Timestamp.now(),
+    if(reminderTime != null) 'reminderTime' : reminderTime!.toIso8601String()
   };
 }
 

@@ -44,7 +44,13 @@ class TodoController extends GetxController{
     });
   }
 
-  Future<void> addTodo(String todo) async => await _repo.addTodo(todo);
+  Future<void> addTodo(String string, DateTime? reminderTime) async {
+    Todo todo = Todo.fresh(string);
+    todo
+      ..isLocal = saveInLocalDb.value
+      ..reminderTime = reminderTime;
+    await _repo.addTodo(todo);
+  }
 
   Future<void> updateTodo(Todo todo) async => await _repo.editTodo(todo);
 
