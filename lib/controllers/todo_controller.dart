@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:todo/model/todo.dart';
 import 'package:todo/repository/todo_repository.dart';
@@ -8,6 +7,7 @@ import 'package:todo/utils/extension.dart';
 import 'package:todo/views/theme/text_style.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 class TodoController extends GetxController{
 
@@ -79,7 +79,7 @@ class TodoController extends GetxController{
 
   Future<void> _setReminder(Todo todo) async{
     tz.initializeTimeZones();
-    final location = tz.getLocation(await FlutterNativeTimezone.getLocalTimezone());
+    final location = tz.getLocation(await FlutterTimezone.getLocalTimezone());
     tz.setLocalLocation(location);
     await _localNotification.zonedSchedule(
       int.parse(todo.id.substring(4)),
