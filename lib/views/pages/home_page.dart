@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
                         Expanded(
                           child: Text(
                             Strings.welcome,
-                            style: AppTextStyle.bold48.copyWith(
+                            style: AppTextStyle.bold32.copyWith(
                               color: Colors.white
                             ),
                           ),
@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                             )
                           ),
                           child: CircleAvatar(
-                            radius: 72,
+                            radius: 54,
                             foregroundImage: authController.user.photoURL == null ? null : NetworkImage(authController.user.photoURL!),
                             child: Text(
                               authController.user.displayName![0].toUpperCase(),
@@ -91,7 +91,7 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(height: 8),
                     Text(
                       authController.user.displayName!,
-                      style: AppTextStyle.bold48.copyWith(
+                      style: AppTextStyle.bold32.copyWith(
                         color: Colors.white
                       )
                     )
